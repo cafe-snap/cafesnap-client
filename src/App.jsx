@@ -1,7 +1,14 @@
+import { Route, Routes } from "react-router-dom";
+import StartinPage from "./page/StartingPage";
+import MainPage from "./page/MainPage";
+
 const App = () => {
 
   return (
-    <h1>초기세팅</h1>
+    <Routes>
+      <Route path="/" element={<StartinPage />} />
+      <Route path="/mainPage" element={<MainPage />} />
+    </Routes>
   );
 };
 
