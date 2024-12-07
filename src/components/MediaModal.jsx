@@ -1,10 +1,21 @@
-const MediaModal = () => {
+import PropTypes from "prop-types";
+
+const MediaModal = ({ source, type }) => {
 
   return(
-    <div className="flex mt-36 w-5/6 h-80 border-2 border-color-white size-3/4">
-      <video src="" autoPlay />
+    <div className="flex mt-36 w-10/12 h-full border-2 border-color-white">
+      {type === "img" ? (
+        <img className="w-full h-full object-contain" src={source} />
+      ) : (
+        <video className="w-full h-full" src={source} autoPlay/>
+      )}
     </div>
   );
+};
+
+MediaModal.propTypes = {
+  source: PropTypes.string.isRequired,
+  type: PropTypes.string.isRequired
 };
 
 export default MediaModal;
