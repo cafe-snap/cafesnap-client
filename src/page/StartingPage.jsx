@@ -2,8 +2,22 @@ import { useNavigate } from "react-router-dom";
 
 const StartinPage = () => {
   const navigate = useNavigate();
+
   const handleClickScreen = () => {
-    navigate("/mainPage");
+    fetch("http://localhost:3000/main", {
+      method: "post"
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          navigate("/mainPage");
+        } else {
+          alert("로그인 요청 실패" + data.error);
+        }
+      })
+      .catch((err) => {
+        alert("로그인 요청 실패" + err);
+      });
   };
 
   return(
