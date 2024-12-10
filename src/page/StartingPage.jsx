@@ -4,7 +4,7 @@ const StartinPage = () => {
   const navigate = useNavigate();
 
   const handleClickScreen = () => {
-    fetch("http://localhost:3000/main", {
+    fetch("http://localhost:3000/login", {
       method: "post"
     })
       .then((res) => res.json())
