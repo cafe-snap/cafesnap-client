@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import MediaModal from "../components/MediaModal";
 import LoadingModal from "../components/LoadingModal";
+import SearchModal from "../components/SearchModal";
 
 const MainPage = () => {
   const [crowlingData, setCrowlingData] = useState(null);
   const [cafeName, setCafeName] = useState(null);
   const [selectName, setSelectName] = useState(null);
   const [mediaIndex, setMediaIndex] = useState(0);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
   useEffect(() => {
     fetch("http://localhost:3000/crowling", {
@@ -50,8 +52,26 @@ const MainPage = () => {
     );
   };
 
+  const handleSearch = (keyword, selectedCafes) => {
+  };
+
   return (
     <div className="flex flex-col w-full min-h-screen bg-black items-center justify-center">
+      <div className="absolute top-4 left-4">
+        <button
+          className="bg-gray-800 p-2 rounded-full text-white"
+          onClick={() => setIsSearchModalOpen(true)}
+        >
+          🔍
+        </button>
+      </div>
+      {isSearchModalOpen && (
+        <SearchModal
+          cafeName={cafeName}
+          isModalHandler={() => setIsSearchModalOpen(false)}
+          searchHandler={handleSearch}
+        />
+      )}
       {(selectName === null)? (
         <LoadingModal />
       ) : (
