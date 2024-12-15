@@ -40,30 +40,32 @@ const MainPage = () => {
 
   const handlePrev = () => {
     setMediaIndex((prev) =>
-      prev === 0
-        ? crowlingData[selectName].length - 1
-        : prev - 1
+      prev === 0 ? crowlingData[selectName].length - 1 : prev - 1
     );
   };
 
   const handleNext = () => {
     setMediaIndex((prev) =>
-      prev === crowlingData[selectName].length - 1
-        ? 0
-        : prev + 1
+      prev === crowlingData[selectName].length - 1 ? 0 : prev + 1
     );
   };
 
   return (
     <div className="flex flex-col w-full min-h-screen bg-black items-center justify-center">
-      {(selectName === null) ? <LoadingModal /> : <MediaModal
-        type={crowlingData[selectName][mediaIndex]?.type}
-        source={crowlingData[selectName][mediaIndex]?.src}
-      />}
+      {(selectName === null)? (
+        <LoadingModal />
+      ) : (
+        <MediaModal
+          type={crowlingData[selectName][mediaIndex]?.type}
+          source={crowlingData[selectName][mediaIndex]?.src}
+        />
+      )}
       <div className="relative w-full flex flex-col items-center text-white mt-16">
         <div className="flex w-full justify-between px-10">
-          <button className="bg-gray-800 rounded-md" onClick={handlePrev}>이전</button>
-          {cafeName === null ? null : (
+          <button className="bg-gray-800 rounded-md" onClick={handlePrev}>
+            이전
+          </button>
+          {(cafeName === null) ? null : (
             <select
               onChange={handleSelector}
               value={selectName}
@@ -76,9 +78,25 @@ const MainPage = () => {
               ))}
             </select>
           )}
-          <button className="bg-gray-800 rounded-md" onClick={handleNext}>다음</button>
+          <button className="bg-gray-800 rounded-md" onClick={handleNext}>
+            다음
+          </button>
         </div>
-        <span>{selectName}</span>
+        <div className="text-center mt-4">
+          {(selectName && crowlingData && crowlingData[selectName]?.[mediaIndex]) ? (
+            <>
+              <span className="block text-lg">{selectName}</span>
+              <a
+                href={crowlingData[selectName][mediaIndex]?.postLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block mt-2 text-white underline"
+              >
+                {crowlingData[selectName][mediaIndex]?.postName}
+              </a>
+            </>
+          ) : null}
+        </div>
       </div>
     </div>
   );
