@@ -7,6 +7,7 @@ const MainPage = () => {
   const [cafeList, setCafeList] = useState(null);
   const [selectedCafe, setSelectedCafe] = useState(null);
   const [mediaIndex, setMediaIndex] = useState(0);
+  const [crawlingDataCache, setCrawlingDataCache] = useState({});
 
   useEffect(() => {
     const initialMediaRequest = async () => {
@@ -16,9 +17,11 @@ const MainPage = () => {
         });
         const data = await response.json();
         if (data.success) {
+          const initialData = data.message.cafeUrlList[0]?.cafeName;
           setInitialCrawlingData(data.message.mediaResource);
           setCafeList(data.message.cafeUrlList);
-          setSelectedCafe(data.message.cafeUrlList[0]?.cafeName);
+          setSelectedCafe(initialData);
+          setCrawlingDataCache({ [initialData]: data.message.mediaResource[initialData] });
         }
       } catch (err) {
         alert(`초기미디어 크롤링 요청 실패 = ${err}`);
@@ -28,7 +31,26 @@ const MainPage = () => {
     initialMediaRequest();
   }, []);
 
-  const selectedCafeMedia = selectedCafe ? (initialCrawlingData?.[selectedCafe] || []) : [];
+  const cafeMediaRequest = async (cafeInfo) => {
+    try {
+      const response = await fetch("http://localhost:3000/posts/selection", {
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(cafeInfo),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setCrawlingDataCache((prev) => ({
+          ...prev,
+          [cafeInfo.cafeName]: data.message,
+        }));
+      }
+    } catch (err) {
+      alert(`카페미디어 크롤링 요청 실패 = ${err}`);
+    }
+  };
+
+  const selectedCafeMedia = selectedCafe ? (crawlingDataCache[selectedCafe] || initialCrawlingData?.[selectedCafe] || []) : [];
 
   const handlePrevious = () => {
     setMediaIndex((prevIndex) => (prevIndex > 0) ? prevIndex - 1 : prevIndex);
@@ -38,9 +60,15 @@ const MainPage = () => {
     setMediaIndex((prevIndex) => (prevIndex < selectedCafeMedia.length - 1) ? prevIndex + 1 : prevIndex);
   };
 
-  const handleSelectChange = (e) => {
-    setSelectedCafe(e.target.value);
+  const handleSelectChange = async (e) => {
+    const newCafe = e.target.value;
+    setSelectedCafe(newCafe);
     setMediaIndex(0);
+    const cafeInfo = cafeList.find((cafe) => cafe.cafeName === newCafe);
+
+    if (!crawlingDataCache[newCafe]) {
+      await cafeMediaRequest(cafeInfo);
+    }
   };
 
   return (
