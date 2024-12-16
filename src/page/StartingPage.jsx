@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-const StartinPage = () => {
+const StartingPage = () => {
   const navigate = useNavigate();
 
   const loginRequest = async () => {
@@ -12,8 +12,6 @@ const StartinPage = () => {
 
       if (data.success) {
         navigate("/mainPage");
-      } else {
-        alert(`로그인 요청 실패 = ${data.error}`);
       }
     } catch (err) {
       alert(`로그인 요청 실패 = ${err}`);
@@ -31,4 +29,4 @@ const StartinPage = () => {
   );
 };
 
-export default StartinPage;
+export default StartingPage;
