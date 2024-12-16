@@ -4,36 +4,40 @@ import LoadingModal from "../components/LoadingModal";
 import SearchModal from "../components/SearchModal";
 
 const MainPage = () => {
-  const [crowlingData, setCrowlingData] = useState(null);
+  const [crawlingData, setCrawlingData] = useState(null);
   const [cafeName, setCafeName] = useState(null);
   const [selectName, setSelectName] = useState(null);
   const [mediaIndex, setMediaIndex] = useState(0);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:3000/crowling", {
-      method: "post"
-    })
-      .then((res) => res.json())
-      .then((data) => {
+    const crawlingRequest = async () => {
+      try {
+        const response = await fetch ("http://localhost:3000/posts", {
+          method: "get",
+        });
+        const data = await response.json();
+
         if (data.success) {
-          setCrowlingData(data.mediaResource.message);
+          setCrawlingData(data.mediaResource.message);
         } else {
-          alert("크롤링 요청 실패");
+          alert(`크롤링 요청 실패 ${data.error}`);
         }
-      })
-      .catch((err) => {
-        alert("크롤링 요청 실패" + err);
-      });
+      } catch (err) {
+        alert(`크롤링 요청 실패 = ${err}`);
+      }
+    };
+
+    crawlingRequest();
   }, []);
 
   useEffect(() => {
-    if (crowlingData !== null) {
-      const infoKeys = Object.keys(crowlingData);
+    if (crawlingData !== null) {
+      const infoKeys = Object.keys(crawlingData);
       setCafeName(infoKeys);
       setSelectName(infoKeys[0]);
     }
-  }, [crowlingData]);
+  }, [crawlingData]);
 
   const handleSelector = (e) => {
     setSelectName(e.target.value);
@@ -42,13 +46,13 @@ const MainPage = () => {
 
   const handlePrev = () => {
     setMediaIndex((prev) =>
-      prev === 0 ? crowlingData[selectName].length - 1 : prev - 1
+      prev === 0 ? crawlingData[selectName].length - 1 : prev - 1
     );
   };
 
   const handleNext = () => {
     setMediaIndex((prev) =>
-      prev === crowlingData[selectName].length - 1 ? 0 : prev + 1
+      prev === crawlingData[selectName].length - 1 ? 0 : prev + 1
     );
   };
 
@@ -76,8 +80,8 @@ const MainPage = () => {
         <LoadingModal />
       ) : (
         <MediaModal
-          type={crowlingData[selectName][mediaIndex]?.type}
-          source={crowlingData[selectName][mediaIndex]?.src}
+          type={crawlingData[selectName][mediaIndex]?.type}
+          source={crawlingData[selectName][mediaIndex]?.src}
         />
       )}
       <div className="relative w-full flex flex-col items-center text-white mt-16">
@@ -103,16 +107,16 @@ const MainPage = () => {
           </button>
         </div>
         <div className="text-center mt-4">
-          {(selectName && crowlingData && crowlingData[selectName]?.[mediaIndex]) ? (
+          {(selectName && crawlingData && crawlingData[selectName]?.[mediaIndex]) ? (
             <>
               <span className="block text-lg">{selectName}</span>
               <a
-                href={crowlingData[selectName][mediaIndex]?.postLink}
+                href={crawlingData[selectName][mediaIndex]?.postLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block mt-2 text-white underline"
               >
-                {crowlingData[selectName][mediaIndex]?.postName}
+                {crawlingData[selectName][mediaIndex]?.postName}
               </a>
             </>
           ) : null}
