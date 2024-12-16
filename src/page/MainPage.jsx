@@ -3,11 +3,12 @@ import MediaModal from "../components/MediaModal";
 import LoadingModal from "../components/LoadingModal";
 
 const MainPage = () => {
-  const [initialCrawlingData, setInitialCrawlingData] = useState(null);
   const [cafeList, setCafeList] = useState(null);
   const [selectedCafe, setSelectedCafe] = useState(null);
   const [mediaIndex, setMediaIndex] = useState(0);
   const [crawlingDataCache, setCrawlingDataCache] = useState({});
+  const [selectedCafeMedia, setSelectedCafeMedia] = useState([]);
+  const [dataLoading, setDataLoading] = useState(false);
 
   useEffect(() => {
     const initialMediaRequest = async () => {
@@ -18,10 +19,9 @@ const MainPage = () => {
         const data = await response.json();
         if (data.success) {
           const initialData = data.message.cafeUrlList[0]?.cafeName;
-          setInitialCrawlingData(data.message.mediaResource);
           setCafeList(data.message.cafeUrlList);
           setSelectedCafe(initialData);
-          setCrawlingDataCache({ [initialData]: data.message.mediaResource[initialData] });
+          setCrawlingDataCache({ [initialData]: data.message.mediaResource });
         }
       } catch (err) {
         alert(`초기미디어 크롤링 요청 실패 = ${err}`);
@@ -32,6 +32,7 @@ const MainPage = () => {
   }, []);
 
   const cafeMediaRequest = async (cafeInfo) => {
+    setDataLoading(true);
     try {
       const response = await fetch("http://localhost:3000/posts/selection", {
         method: "post",
@@ -47,10 +48,17 @@ const MainPage = () => {
       }
     } catch (err) {
       alert(`카페미디어 크롤링 요청 실패 = ${err}`);
+    } finally {
+      setDataLoading(false);
     }
   };
 
-  const selectedCafeMedia = selectedCafe ? (crawlingDataCache[selectedCafe] || initialCrawlingData?.[selectedCafe] || []) : [];
+  useEffect(() => {
+    if (selectedCafe && dataLoading === false) {
+      const newMedia = (Object.values(crawlingDataCache[selectedCafe])[0]) || [];
+      setSelectedCafeMedia(newMedia);
+    }
+  }, [selectedCafe, crawlingDataCache]);
 
   const handlePrevious = () => {
     setMediaIndex((prevIndex) => (prevIndex > 0) ? prevIndex - 1 : prevIndex);
@@ -80,7 +88,7 @@ const MainPage = () => {
           🔍
         </button>
       </div>
-      {(initialCrawlingData === null)? (
+      {(selectedCafeMedia.length === 0)? (
         <LoadingModal />
       ) : (
         <MediaModal
@@ -88,6 +96,10 @@ const MainPage = () => {
           source={selectedCafeMedia[mediaIndex]?.src}
         />
       )}
+      {dataLoading ?
+        <span className="flex mt-4 text-white">새로운 미디어 로딩중...</span> :
+        null
+      }
       <div className="relative w-full flex flex-col items-center text-white mt-16">
         <div className="flex w-full justify-between px-10">
           <button
