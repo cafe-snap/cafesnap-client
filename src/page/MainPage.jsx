@@ -1,62 +1,46 @@
 import { useEffect, useState } from "react";
 import MediaModal from "../components/MediaModal";
 import LoadingModal from "../components/LoadingModal";
-import SearchModal from "../components/SearchModal";
 
 const MainPage = () => {
-  const [crawlingData, setCrawlingData] = useState(null);
-  const [cafeName, setCafeName] = useState(null);
-  const [selectName, setSelectName] = useState(null);
+  const [initialCrawlingData, setInitialCrawlingData] = useState(null);
+  const [cafeList, setCafeList] = useState(null);
+  const [selectedCafe, setSelectedCafe] = useState(null);
   const [mediaIndex, setMediaIndex] = useState(0);
-  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
   useEffect(() => {
-    const crawlingRequest = async () => {
+    const initialMediaRequest = async () => {
       try {
-        const response = await fetch ("http://localhost:3000/posts", {
-          method: "get",
+        const response = await fetch("http://localhost:3000/posts/initial", {
+          method: "post",
         });
         const data = await response.json();
-
         if (data.success) {
-          setCrawlingData(data.mediaResource.message);
-        } else {
-          alert(`크롤링 요청 실패 ${data.error}`);
+          setInitialCrawlingData(data.message.mediaResource);
+          setCafeList(data.message.cafeUrlList);
+          setSelectedCafe(data.message.cafeUrlList[0]?.cafeName);
         }
       } catch (err) {
-        alert(`크롤링 요청 실패 = ${err}`);
+        alert(`초기미디어 크롤링 요청 실패 = ${err}`);
       }
     };
 
-    crawlingRequest();
+    initialMediaRequest();
   }, []);
 
-  useEffect(() => {
-    if (crawlingData !== null) {
-      const infoKeys = Object.keys(crawlingData);
-      setCafeName(infoKeys);
-      setSelectName(infoKeys[0]);
-    }
-  }, [crawlingData]);
+  const selectedCafeMedia = selectedCafe ? (initialCrawlingData?.[selectedCafe] || []) : [];
 
-  const handleSelector = (e) => {
-    setSelectName(e.target.value);
-    setMediaIndex(0);
-  };
-
-  const handlePrev = () => {
-    setMediaIndex((prev) =>
-      prev === 0 ? crawlingData[selectName].length - 1 : prev - 1
-    );
+  const handlePrevious = () => {
+    setMediaIndex((prevIndex) => (prevIndex > 0) ? prevIndex - 1 : prevIndex);
   };
 
   const handleNext = () => {
-    setMediaIndex((prev) =>
-      prev === crawlingData[selectName].length - 1 ? 0 : prev + 1
-    );
+    setMediaIndex((prevIndex) => (prevIndex < selectedCafeMedia.length - 1) ? prevIndex + 1 : prevIndex);
   };
 
-  const handleSearch = (keyword, selectedCafes) => {
+  const handleSelectChange = (e) => {
+    setSelectedCafe(e.target.value);
+    setMediaIndex(0);
   };
 
   return (
@@ -64,62 +48,45 @@ const MainPage = () => {
       <div className="absolute top-4 left-4">
         <button
           className="bg-gray-800 p-2 rounded-full text-white"
-          onClick={() => setIsSearchModalOpen(true)}
         >
           🔍
         </button>
       </div>
-      {isSearchModalOpen && (
-        <SearchModal
-          cafeName={cafeName}
-          isModalHandler={() => setIsSearchModalOpen(false)}
-          searchHandler={handleSearch}
-        />
-      )}
-      {(selectName === null)? (
+      {(initialCrawlingData === null)? (
         <LoadingModal />
       ) : (
         <MediaModal
-          type={crawlingData[selectName][mediaIndex]?.type}
-          source={crawlingData[selectName][mediaIndex]?.src}
+          type={selectedCafeMedia[mediaIndex]?.type}
+          source={selectedCafeMedia[mediaIndex]?.src}
         />
       )}
       <div className="relative w-full flex flex-col items-center text-white mt-16">
         <div className="flex w-full justify-between px-10">
-          <button className="bg-gray-800 rounded-md" onClick={handlePrev}>
+          <button
+            onClick={handlePrevious}
+            className="bg-gray-800 rounded-md px-4 py-2"
+            disabled={mediaIndex === 0}
+          >
             이전
           </button>
-          {(cafeName === null) ? null : (
-            <select
-              onChange={handleSelector}
-              value={selectName}
-              className="w-28 truncate bg-gray-800 text-white border border-gray-700 rounded-md px-2 py-1 text-sm"
-            >
-              {cafeName.map((ele) => (
-                <option value={ele} key={ele}>
-                  {ele}
-                </option>
-              ))}
-            </select>
-          )}
-          <button className="bg-gray-800 rounded-md" onClick={handleNext}>
+          <select
+            value={selectedCafe || ""}
+            onChange={handleSelectChange}
+            className="w-28 truncate bg-gray-800 text-white border border-gray-700 rounded-md px-2 py-1 text-sm"
+          >
+            {cafeList?.map((cafe, index) => (
+              <option key={index} value={cafe.cafeName}>
+                {cafe.cafeName}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={handleNext}
+            className="bg-gray-800 rounded-md px-4 py-2"
+            disabled={mediaIndex >= selectedCafeMedia.length - 1}
+          >
             다음
           </button>
-        </div>
-        <div className="text-center mt-4">
-          {(selectName && crawlingData && crawlingData[selectName]?.[mediaIndex]) ? (
-            <>
-              <span className="block text-lg">{selectName}</span>
-              <a
-                href={crawlingData[selectName][mediaIndex]?.postLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block mt-2 text-white underline"
-              >
-                {crawlingData[selectName][mediaIndex]?.postName}
-              </a>
-            </>
-          ) : null}
         </div>
       </div>
     </div>
