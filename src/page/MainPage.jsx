@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import MediaModal from "../components/MediaModal";
 import LoadingModal from "../components/LoadingModal";
+import MediaModal from "../components/MediaModal";
+import SearchModal from "../components/SearchModal";
 
 const MainPage = () => {
   const [cafeList, setCafeList] = useState(null);
@@ -9,6 +10,9 @@ const MainPage = () => {
   const [crawlingDataCache, setCrawlingDataCache] = useState({});
   const [selectedCafeMedia, setSelectedCafeMedia] = useState([]);
   const [dataLoading, setDataLoading] = useState(false);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [searchingData, setSearchingData] = useState([]);
+  const [isSearchReady, setIsSearchReady] = useState(false);
 
   useEffect(() => {
     const initialMediaRequest = async () => {
@@ -53,6 +57,23 @@ const MainPage = () => {
     }
   };
 
+  const keywordMediaRequest = async (keyword, cafeInfo) => {
+    try {
+      const response = await fetch("http://localhost:3000/posts/keyword", {
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ keyword, cafeInfo }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setSearchingData(data.message);
+        setIsSearchReady(true);
+      }
+    } catch (err) {
+      alert(`카페미디어 크롤링 요청 실패 = ${err}`);
+    }
+  };
+
   useEffect(() => {
     if (selectedCafe && dataLoading === false) {
       const newMedia = (Object.values(crawlingDataCache[selectedCafe])[0]) || [];
@@ -79,15 +100,34 @@ const MainPage = () => {
     }
   };
 
+  const handleSearch = async (keyword, cafeName) => {
+    const cafeInfo = cafeList.find((cafe) => cafe.cafeName === cafeName);
+    await keywordMediaRequest(keyword, cafeInfo);
+  };
+
+  const handleSearchConfirm = () => {
+    setSelectedCafeMedia(Object.values(searchingData)[0]);
+    setMediaIndex(0);
+    setIsSearchReady(false);
+  };
+
   return (
     <div className="flex flex-col w-full min-h-screen bg-black items-center justify-center">
       <div className="absolute top-4 left-4">
-        <button
-          className="bg-gray-800 p-2 rounded-full text-white"
+        {(selectedCafeMedia.length !== 0)? <button
+          className="bg-green-500 p-2 rounded-full text-white"
+          onClick={() => setIsSearchModalOpen(true)}
         >
           🔍
-        </button>
+        </button> : null}
       </div>
+      {isSearchModalOpen && (
+        <SearchModal
+          cafeName={cafeList}
+          isModalHandler={() => setIsSearchModalOpen(false)}
+          searchHandler={handleSearch}
+        />
+      )}
       {(selectedCafeMedia.length === 0)? (
         <LoadingModal />
       ) : (
@@ -100,11 +140,23 @@ const MainPage = () => {
         <span className="flex mt-4 text-white">새로운 미디어 로딩중...</span> :
         null
       }
+      {isSearchReady && (
+        <>
+          <span className="flex mt-4 text-white">🔍 검색 결과가 도착했습니다 🔍</span>
+          <span className="flex mt-4 text-white">확인 버튼을 눌러 시청해주세요</span>
+          <button
+            onClick={handleSearchConfirm}
+            className="ml-2 text-white bg-green-500 px-2 py-1 rounded-md"
+          >
+            확인
+          </button>
+        </>
+      )}
       <div className="relative w-full flex flex-col items-center text-white mt-16">
         <div className="flex w-full justify-between px-10">
           <button
             onClick={handlePrevious}
-            className="bg-gray-800 rounded-md px-4 py-2"
+            className="bg-green-500 rounded-md px-4 py-2"
             disabled={mediaIndex === 0}
           >
             이전
@@ -122,7 +174,7 @@ const MainPage = () => {
           </select>
           <button
             onClick={handleNext}
-            className="bg-gray-800 rounded-md px-4 py-2"
+            className="bg-green-500 rounded-md px-4 py-2"
             disabled={mediaIndex >= selectedCafeMedia.length - 1}
           >
             다음

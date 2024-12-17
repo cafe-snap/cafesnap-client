@@ -73,7 +73,6 @@ const SearchModal = ({ cafeName, isModalHandler, searchHandler }) => {
           </div>
         )}
         <div className="mb-4">
-          <p className="font-medium mb-2">카페 선택:</p>
           <select
             value={selectedCafe}
             onChange={(e) => setSelectedCafe(e.target.value)}
@@ -82,9 +81,9 @@ const SearchModal = ({ cafeName, isModalHandler, searchHandler }) => {
             <option value="" disabled>
               카페를 선택하세요
             </option>
-            {cafeName?.map((cafe) => (
-              <option key={cafe} value={cafe}>
-                {cafe}
+            {cafeName?.map((cafe, index) => (
+              <option key={index} value={cafe.cafeName}>
+                {cafe.cafeName}
               </option>
             ))}
           </select>
