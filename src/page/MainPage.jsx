@@ -189,10 +189,6 @@ const MainPage = () => {
           source={selectedCafeMedia[mediaIndex]?.src}
         />
       )}
-      {dataLoading ?
-        <span className="flex mt-4 text-white">새로운 미디어 로딩중...</span> :
-        null
-      }
       {isSearchReady && (
         <>
           <span className="flex mt-4 text-white">🔍 검색 결과가 도착했습니다 🔍</span>
@@ -217,35 +213,41 @@ const MainPage = () => {
           </strong>
         </a>
       )}
-      <div className="relative w-full flex flex-col items-center text-white mt-8">
-        <div className="flex w-full justify-between px-10">
-          <button
-            onClick={handlePrevious}
-            className="bg-green-500 rounded-md px-4 py-2"
-            disabled={mediaIndex === 0}
-          >
-            이전
-          </button>
-          <select
-            value={selectedCafe || ""}
-            onChange={handleSelectChange}
-            className="w-28 truncate bg-gray-800 text-white border border-gray-700 rounded-md px-2 py-1 text-sm"
-          >
-            {cafeList?.map((cafe, index) => (
-              <option key={index} value={cafe.cafeName}>
-                {cafe.cafeName}
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={handleNext}
-            className="bg-green-500 rounded-md px-4 py-2"
-            disabled={mediaIndex >= selectedCafeMedia.length - 1}
-          >
-            다음
-          </button>
+      {dataLoading ?
+        <span className="flex mt-4 text-white">새로운 미디어 로딩중...</span> :
+        null
+      }
+      {(selectedCafeMedia.length === 0)? null :
+        <div className="relative w-full flex flex-col items-center text-white mt-8">
+          <div className="flex w-full justify-between px-10">
+            <button
+              onClick={handlePrevious}
+              className="bg-green-500 rounded-md px-4 py-2"
+              disabled={mediaIndex === 0}
+            >
+              이전
+            </button>
+            <select
+              value={selectedCafe || ""}
+              onChange={handleSelectChange}
+              className="w-28 truncate bg-gray-800 text-white border border-gray-700 rounded-md px-2 py-1 text-sm"
+            >
+              {cafeList?.map((cafe, index) => (
+                <option key={index} value={cafe.cafeName}>
+                  {cafe.cafeName}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={handleNext}
+              className="bg-green-500 rounded-md px-4 py-2"
+              disabled={mediaIndex >= selectedCafeMedia.length - 1}
+            >
+              다음
+            </button>
+          </div>
         </div>
-      </div>
+      }
     </div>
   );
 };
