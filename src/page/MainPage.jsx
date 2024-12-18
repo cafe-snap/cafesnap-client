@@ -13,6 +13,7 @@ const MainPage = () => {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [searchingData, setSearchingData] = useState([]);
   const [isSearchReady, setIsSearchReady] = useState(false);
+  const [urlIndex, setUrlIndex] = useState({});
 
   useEffect(() => {
     const initialMediaRequest = async () => {
@@ -21,11 +22,13 @@ const MainPage = () => {
           method: "post",
         });
         const data = await response.json();
+
         if (data.success) {
           const initialData = data.message.cafeUrlList[0]?.cafeName;
           setCafeList(data.message.cafeUrlList);
           setSelectedCafe(initialData);
-          setCrawlingDataCache({ [initialData]: data.message.mediaResource });
+          setCrawlingDataCache({ [initialData]: data.message.mediaResource[initialData] });
+          setUrlIndex({ [initialData]: data.message.returnUrl });
         }
       } catch (err) {
         alert(`초기미디어 크롤링 요청 실패 = ${err}`);
@@ -44,10 +47,16 @@ const MainPage = () => {
         body: JSON.stringify(cafeInfo),
       });
       const data = await response.json();
+
       if (data.success) {
+        const newReturnUrl = data.message.returnUrl || "";
         setCrawlingDataCache((prev) => ({
           ...prev,
-          [cafeInfo.cafeName]: data.message,
+          [cafeInfo.cafeName]: data.message.mediaResource[cafeInfo.cafeName],
+        }));
+        setUrlIndex((prev) => ({
+          ...prev,
+          [cafeInfo.cafeName]: newReturnUrl,
         }));
       }
     } catch (err) {
@@ -65,6 +74,7 @@ const MainPage = () => {
         body: JSON.stringify({ keyword, cafeInfo }),
       });
       const data = await response.json();
+
       if (data.success) {
         setSearchingData(data.message);
         setIsSearchReady(true);
