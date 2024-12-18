@@ -3,11 +3,11 @@ import PropTypes from "prop-types";
 const MediaModal = ({ source, type }) => {
 
   return(
-    <div className="flex mt-36 w-10/12 h-full border-2 border-color-white">
+    <div className="flex mt-8 border-2 border-green-800 w-full h-[400px] justify-center items-center bg-black">
       {type === "img" ? (
-        <img className="w-full h-full object-contain" src={source} />
+        <img className="object-contain w-auto h-full max-w-full" src={source} />
       ) : (
-        <video className="w-full h-full" src={source} autoPlay playsInline/>
+        <video className="object-contain w-auto h-full max-w-full" src={source} autoPlay playsInline controls/>
       )}
     </div>
   );
