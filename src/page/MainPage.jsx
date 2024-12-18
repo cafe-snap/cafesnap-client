@@ -115,7 +115,7 @@ const MainPage = () => {
 
   useEffect(() => {
     if (selectedCafe && dataLoading === false) {
-      const newMedia = (Object.values(crawlingDataCache[selectedCafe])[0]) || [];
+      const newMedia = (Object.values(crawlingDataCache[selectedCafe])) || [];
       setSelectedCafeMedia(newMedia);
     }
   }, [selectedCafe, crawlingDataCache]);
@@ -124,8 +124,22 @@ const MainPage = () => {
     setMediaIndex((prevIndex) => (prevIndex > 0) ? prevIndex - 1 : prevIndex);
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     setMediaIndex((prevIndex) => (prevIndex < selectedCafeMedia.length - 1) ? prevIndex + 1 : prevIndex);
+    const cafeInfo = cafeList.find((cafe) => cafe.cafeName === selectedCafe);
+
+    if (mediaIndex === 1) {
+      const postUrl = urlIndex[selectedCafe];
+      let nextUrl = "";
+
+      if (postUrl) {
+        nextUrl = postUrl.replace(/(search\.page=)(\d+)/, (match, prefix, pageNum) => {
+          const newPageNum = Number(pageNum) + 2;
+          return `${prefix}${newPageNum}`;
+        });
+      }
+      await extraCafeMediaRequest(nextUrl, cafeInfo);
+    }
   };
 
   const handleSelectChange = async (e) => {
