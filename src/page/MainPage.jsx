@@ -205,7 +205,19 @@ const MainPage = () => {
           </button>
         </>
       )}
-      <div className="relative w-full flex flex-col items-center text-white mt-16">
+      {selectedCafeMedia[mediaIndex]?.postName && (
+        <a
+          href={selectedCafeMedia[mediaIndex]?.postLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 text-gray-300 text-sm"
+        >
+          <strong>
+            {selectedCafeMedia[mediaIndex]?.postName}
+          </strong>
+        </a>
+      )}
+      <div className="relative w-full flex flex-col items-center text-white mt-8">
         <div className="flex w-full justify-between px-10">
           <button
             onClick={handlePrevious}
