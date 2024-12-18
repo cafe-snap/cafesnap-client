@@ -84,6 +84,35 @@ const MainPage = () => {
     }
   };
 
+  const extraCafeMediaRequest = async (nextUrl, cafeInfo) => {
+    try {
+      const response = await fetch("http://localhost:3000/posts/addition", {
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nextUrl, cafeInfo }),
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        const newMedia = data.message.mediaResource[cafeInfo.cafeName] || [];
+        const newReturnUrl = data.message.returnUrl || "";
+        setCrawlingDataCache((prev) => {
+          const existingMedia = prev[cafeInfo.cafeName] || [];
+          return {
+            ...prev,
+            [cafeInfo.cafeName]: [...existingMedia, ...newMedia],
+          };
+        });
+        setUrlIndex((prev) => ({
+          ...prev,
+          [cafeInfo.cafeName]: newReturnUrl,
+        }));
+      }
+    } catch (err) {
+      alert(`카페미디어 크롤링 요청 실패 = ${err}`);
+    }
+  };
+
   useEffect(() => {
     if (selectedCafe && dataLoading === false) {
       const newMedia = (Object.values(crawlingDataCache[selectedCafe])[0]) || [];
