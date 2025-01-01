@@ -24,7 +24,7 @@ const StartingPage = () => {
       onClick={loginRequest}
     >
       <span className="text-green-500 text-5xl">CAFESNAP</span>
-      <span className="text-white text-2xl">로그인을 실행해주세요</span>
+      <span className="text-white text-2xl">로그인을 실행해 주세요</span>
     </div>
   );
 };

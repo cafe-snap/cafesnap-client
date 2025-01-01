@@ -7,9 +7,9 @@ import { useState } from "react";
 const LoadingModal = () => {
   const images = [
     { src: mainImg1, description: "해당 카페의 미디어를 즐겨보세요!" },
-    { src: mainImg2, description: "다른 카페의 미디어도 확인해보세요!" },
-    { src: mainImg3, description: "원본 게시글을 확인해보세요!" },
-    { src: searchImg, description: "원하는 키워드의 미디어를 확인해보세요!" },
+    { src: mainImg2, description: "다른 카페의 미디어도 확인해 보세요!" },
+    { src: mainImg3, description: "원본 게시글을 확인해 보세요!" },
+    { src: searchImg, description: "원하는 키워드의 미디어를 확인해 보세요!" },
   ];
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -26,7 +26,11 @@ const LoadingModal = () => {
         <div className="absolute w-4 h-4 rounded-full bg-green-600 animate-bigBounce" />
         <div className="text-white text-lg font-light align-text-top ml-8 tracking-widest">
           <strong>
-            데이터를 불러오는중 입니다
+            데이터를 불러오는 중입니다
+          </strong>
+          <br />
+          <strong>
+            약 1분 정도 소요됩니다
           </strong>
         </div>
       </div>
@@ -47,7 +51,7 @@ const LoadingModal = () => {
         onClick={handleNextImage}
         className="mt-4 px-2 py-1 bg-green-500 text-white text-sm rounded-lg hover:bg-green-800 transition"
       >
-        확인
+        계속
       </button>
     </div>
   );

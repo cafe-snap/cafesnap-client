@@ -192,7 +192,7 @@ const MainPage = () => {
       {isSearchReady && (
         <>
           <span className="flex mt-4 text-white">🔍 검색 결과가 도착했습니다 🔍</span>
-          <span className="flex mt-4 text-white">확인 버튼을 눌러 시청해주세요</span>
+          <span className="flex mt-4 text-white">확인 버튼을 눌러 시청해 주세요</span>
           <button
             onClick={handleSearchConfirm}
             className="ml-2 text-white bg-green-500 px-2 py-1 rounded-md"
