@@ -6,14 +6,15 @@ import SearchModal from "../components/SearchModal";
 const MainPage = () => {
   const [cafeList, setCafeList] = useState(null);
   const [selectedCafe, setSelectedCafe] = useState(null);
-  const [mediaIndex, setMediaIndex] = useState(0);
-  const [crawlingDataCache, setCrawlingDataCache] = useState({});
-  const [selectedCafeMedia, setSelectedCafeMedia] = useState([]);
   const [dataLoading, setDataLoading] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-  const [searchingData, setSearchingData] = useState([]);
   const [isSearchReady, setIsSearchReady] = useState(false);
+  const [isTrigger, setIsTrigger] = useState(false);
+  const [mediaIndex, setMediaIndex] = useState(0);
+  const [crawlingDataCache, setCrawlingDataCache] = useState({});
   const [urlIndex, setUrlIndex] = useState({});
+  const [selectedCafeMedia, setSelectedCafeMedia] = useState([]);
+  const [searchingData, setSearchingData] = useState([]);
 
   useEffect(() => {
     const initialMediaRequest = async () => {
@@ -29,6 +30,7 @@ const MainPage = () => {
           setSelectedCafe(initialData);
           setCrawlingDataCache({ [initialData]: data.message.mediaResource[initialData] });
           setUrlIndex({ [initialData]: data.message.returnUrl });
+          setIsTrigger(true);
         }
       } catch (err) {
         alert(`초기미디어 크롤링 요청 실패 = ${err}`);
@@ -65,6 +67,17 @@ const MainPage = () => {
       setDataLoading(false);
     }
   };
+
+  useEffect(() => {
+
+    if ((cafeList !== null) && (isTrigger === true)) {
+      for (let i = 1; i < 4; i++) {
+        cafeMediaRequest(cafeList[i]);
+      }
+    }
+
+  }, [cafeList, isTrigger]);
+
 
   const keywordMediaRequest = async (keyword, cafeInfo) => {
     try {
