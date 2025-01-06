@@ -15,6 +15,8 @@ const MainPage = () => {
   const [urlIndex, setUrlIndex] = useState({});
   const [selectedCafeMedia, setSelectedCafeMedia] = useState([]);
   const [searchingData, setSearchingData] = useState([]);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
 
   useEffect(() => {
     const initialMediaRequest = async () => {
@@ -177,8 +179,31 @@ const MainPage = () => {
     setIsSearchReady(false);
   };
 
+  const handleTouchStart = (e) => {
+    setTouchStart(e.changedTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e) => {
+    setTouchEnd(e.changedTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if ((touchStart - touchEnd) > 120) {
+      handleNext();
+    }
+
+    if ((touchStart - touchEnd) < -120) {
+      handlePrevious();
+    }
+  };
+
   return (
-    <div className="flex flex-col w-full min-h-screen bg-black items-center justify-center">
+    <div
+      className="flex flex-col w-full min-h-screen bg-black items-center justify-center"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
       <div className="absolute top-4 left-4">
         {(selectedCafeMedia.length !== 0)? <button
           className="bg-green-500 p-2 rounded-full text-white"
@@ -232,33 +257,17 @@ const MainPage = () => {
       }
       {(selectedCafeMedia.length === 0)? null :
         <div className="relative w-full flex flex-col items-center text-white mt-8">
-          <div className="flex w-full justify-between px-10">
-            <button
-              onClick={handlePrevious}
-              className="bg-green-500 rounded-md px-4 py-2"
-              disabled={mediaIndex === 0}
-            >
-              이전
-            </button>
-            <select
-              value={selectedCafe || ""}
-              onChange={handleSelectChange}
-              className="w-28 truncate bg-gray-800 text-white border border-gray-700 rounded-md px-2 py-1 text-sm"
-            >
-              {cafeList?.map((cafe, index) => (
-                <option key={index} value={cafe.cafeName}>
-                  {cafe.cafeName}
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={handleNext}
-              className="bg-green-500 rounded-md px-4 py-2"
-              disabled={mediaIndex >= selectedCafeMedia.length - 1}
-            >
-              다음
-            </button>
-          </div>
+          <select
+            value={selectedCafe || ""}
+            onChange={handleSelectChange}
+            className="w-28 truncate bg-gray-800 text-white border border-gray-700 rounded-md px-2 py-1 text-sm"
+          >
+            {cafeList?.map((cafe, index) => (
+              <option key={index} value={cafe.cafeName}>
+                {cafe.cafeName}
+              </option>
+            ))}
+          </select>
         </div>
       }
     </div>

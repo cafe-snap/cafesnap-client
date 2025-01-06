@@ -7,7 +7,14 @@ const MediaModal = ({ source, type }) => {
       {type === "img" ? (
         <img className="object-contain w-auto h-full max-w-full" src={source} />
       ) : (
-        <video className="object-contain w-auto h-full max-w-full" src={source} autoPlay playsInline controls/>
+        <video
+          className="object-contain w-auto h-full max-w-full"
+          src={source}
+          autoPlay
+          playsInline
+          controls
+          muted
+        />
       )}
     </div>
   );
