@@ -228,21 +228,29 @@ const MainPage = () => {
               className="absolute mt-6 ml-6 w-full overflow-x-auto no-scrollbar z-10"
               style={{ whiteSpace: "nowrap" }}
             >
-              {cafeList.map((cafe, index) => (
-                <button
-                  key={index}
-                  className={`w-10 h-10 flex-shrink-0 rounded-full overflow-hidden border-2 ${
-                    selectedCafe === cafe.cafeName ? "border-green-500" : "border-gray-700"
-                  } ${selectedCafe && selectedCafe !== cafe.cafeName ? "hidden" : ""}`}
-                  onClick={() => handleLogoClick(cafe.cafeName)}
-                >
-                  <img
-                    src={cafe.cafeLogo}
-                    alt={cafe.cafeName}
-                    className="w-full h-full object-cover"
-                  />
-                </button>
-              ))}
+              {cafeList.map((cafe, index) => {
+                const hasData = crawlingDataCache[cafe.cafeName] && crawlingDataCache[cafe.cafeName].length > 0;
+
+                return (
+                  <button
+                    key={index}
+                    className={`w-10 h-10 flex-shrink-0 rounded-full overflow-hidden border-2 ${
+                      selectedCafe === cafe.cafeName ? "border-green-500" : "border-gray-700"
+                    } ${selectedCafe && selectedCafe !== cafe.cafeName ? "hidden" : ""}`}
+                    onClick={() => handleLogoClick(cafe.cafeName)}
+                    style={{
+                      opacity: hasData ? 1 : 0.5,
+                      pointerEvents: hasData ? "auto" : "none",
+                    }}
+                  >
+                    <img
+                      src={cafe.cafeLogo}
+                      alt={cafe.cafeName}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                );
+              })}
             </div>
             <div className="relative flex flex-row items-center justify-center mt-4 ml-12 gap-x-4 w-full px-4">
               {selectedCafeMedia[mediaIndex]?.postName && (
