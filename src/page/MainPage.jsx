@@ -199,7 +199,7 @@ const MainPage = () => {
 
   return (
     <div
-      className="flex flex-col w-full min-h-screen bg-black items-center justify-center"
+      className="flex flex-col w-full min-h-screen bg-black items-center"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
