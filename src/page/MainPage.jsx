@@ -157,17 +157,6 @@ const MainPage = () => {
     }
   };
 
-  const handleSelectChange = async (e) => {
-    const newCafe = e.target.value;
-    setSelectedCafe(newCafe);
-    setMediaIndex(0);
-    const cafeInfo = cafeList.find((cafe) => cafe.cafeName === newCafe);
-
-    if (!crawlingDataCache[newCafe]) {
-      await cafeMediaRequest(cafeInfo);
-    }
-  };
-
   const handleSearch = async (keyword, cafeName) => {
     const cafeInfo = cafeList.find((cafe) => cafe.cafeName === cafeName);
     await keywordMediaRequest(keyword, cafeInfo);
@@ -197,6 +186,13 @@ const MainPage = () => {
     }
   };
 
+  const handleLogoClick = (cafeName) => {
+    if (selectedCafe === cafeName) {
+      setSelectedCafe(null);
+    } else {
+      setSelectedCafe(cafeName);
+    }
+  };
   return (
     <div
       className="flex flex-col w-full min-h-screen bg-black items-center"
@@ -204,21 +200,6 @@ const MainPage = () => {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="absolute top-4 left-4">
-        {(selectedCafeMedia.length !== 0)? <button
-          className="bg-green-500 p-2 rounded-full text-white"
-          onClick={() => setIsSearchModalOpen(true)}
-        >
-          🔍
-        </button> : null}
-      </div>
-      {isSearchModalOpen && (
-        <SearchModal
-          cafeName={cafeList}
-          isModalHandler={() => setIsSearchModalOpen(false)}
-          searchHandler={handleSearch}
-        />
-      )}
       {(selectedCafeMedia.length === 0)? (
         <LoadingModal />
       ) : (
@@ -227,49 +208,54 @@ const MainPage = () => {
           source={selectedCafeMedia[mediaIndex]?.src}
         />
       )}
-      {isSearchReady && (
-        <>
-          <span className="flex mt-4 text-white">🔍 검색 결과가 도착했습니다 🔍</span>
-          <span className="flex mt-4 text-white">확인 버튼을 눌러 시청해 주세요</span>
-          <button
-            onClick={handleSearchConfirm}
-            className="ml-2 text-white bg-green-500 px-2 py-1 rounded-md"
+      <div className="flex flex-col items-center justify-center w-full mt-[420px]">
+        {isSearchReady && (
+          <>
+            <span className="flex mt-4 text-white">🔍 검색 결과가 도착했습니다 🔍</span>
+            <span className="flex mt-4 text-white">확인 버튼을 눌러 시청해 주세요</span>
+            <button
+              onClick={handleSearchConfirm}
+              className="ml-2 text-white bg-green-500 px-2 py-1 rounded-md"
+            >
+              확인
+            </button>
+          </>
+        )}
+        {selectedCafeMedia[mediaIndex]?.postName && (
+          <a
+            href={selectedCafeMedia[mediaIndex]?.postLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 text-gray-300 text-sm"
           >
-            확인
-          </button>
-        </>
-      )}
-      {selectedCafeMedia[mediaIndex]?.postName && (
-        <a
-          href={selectedCafeMedia[mediaIndex]?.postLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 text-gray-300 text-sm"
-        >
-          <strong>
-            {selectedCafeMedia[mediaIndex]?.postName}
-          </strong>
-        </a>
-      )}
-      {dataLoading ?
-        <span className="flex mt-4 text-white">새로운 미디어 로딩중...</span> :
-        null
-      }
-      {(selectedCafeMedia.length === 0)? null :
-        <div className="relative w-full flex flex-col items-center text-white mt-8">
-          <select
-            value={selectedCafe || ""}
-            onChange={handleSelectChange}
-            className="w-28 truncate bg-gray-800 text-white border border-gray-700 rounded-md px-2 py-1 text-sm"
-          >
-            {cafeList?.map((cafe, index) => (
-              <option key={index} value={cafe.cafeName}>
-                {cafe.cafeName}
-              </option>
+            <strong>
+              {selectedCafeMedia[mediaIndex]?.postName}
+            </strong>
+          </a>
+        )}
+        {dataLoading ?
+          <span className="flex mt-4 text-white">새로운 미디어 로딩중...</span> :
+          null
+        }
+        {(selectedCafeMedia.length === 0)? null :
+          <div className="flex flex-col items-center gap-2">
+            {cafeList.map((cafe, index) => (
+              <button
+                key={index}
+                className={`w-12 h-12 rounded-full overflow-hidden border-2 ${
+                  selectedCafe === cafe.cafeName ? "border-green-500" : "border-gray-700"
+                } ${selectedCafe && selectedCafe !== cafe.cafeName ? "hidden" : ""}`}
+                onClick={() => handleLogoClick(cafe.cafeName)}
+              >
+                <img
+                  src={cafe.cafeLogo}
+                  alt={cafe.cafeName}
+                  className="w-full h-full object-cover"
+                />
+              </button>
             ))}
-          </select>
-        </div>
-      }
+          </div>}
+      </div>
     </div>
   );
 };
