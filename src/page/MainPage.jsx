@@ -200,7 +200,7 @@ const MainPage = () => {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {(selectedCafeMedia.length === 0)? (
+      {(selectedCafeMedia.length === 0) ? (
         <LoadingModal />
       ) : (
         <MediaModal
@@ -221,6 +221,27 @@ const MainPage = () => {
             </button>
           </>
         )}
+        {selectedCafeMedia.length === 0 ? null : (
+          <div className="flex flex-row items-center justify-between gap-4 mt-4 w-full px-4">
+            <div className="flex items-center">
+              {cafeList.map((cafe, index) => (
+                <button
+                  key={index}
+                  className={`w-12 h-12 rounded-full overflow-hidden border-2 ${
+                    selectedCafe === cafe.cafeName ? "border-green-500" : "border-gray-700"
+                  } ${selectedCafe && selectedCafe !== cafe.cafeName ? "hidden" : ""}`}
+                  onClick={() => handleLogoClick(cafe.cafeName)}
+                >
+                  <img
+                    src={cafe.cafeLogo}
+                    alt={cafe.cafeName}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         {selectedCafeMedia[mediaIndex]?.postName && (
           <a
             href={selectedCafeMedia[mediaIndex]?.postLink}
@@ -228,33 +249,26 @@ const MainPage = () => {
             rel="noopener noreferrer"
             className="mt-2 text-gray-300 text-sm"
           >
-            <strong>
-              {selectedCafeMedia[mediaIndex]?.postName}
-            </strong>
+            <strong>{selectedCafeMedia[mediaIndex]?.postName}</strong>
           </a>
         )}
-        {dataLoading ?
-          <span className="flex mt-4 text-white">새로운 미디어 로딩중...</span> :
-          null
-        }
-        {(selectedCafeMedia.length === 0)? null :
-          <div className="flex flex-col items-center gap-2">
-            {cafeList.map((cafe, index) => (
-              <button
-                key={index}
-                className={`w-12 h-12 rounded-full overflow-hidden border-2 ${
-                  selectedCafe === cafe.cafeName ? "border-green-500" : "border-gray-700"
-                } ${selectedCafe && selectedCafe !== cafe.cafeName ? "hidden" : ""}`}
-                onClick={() => handleLogoClick(cafe.cafeName)}
-              >
-                <img
-                  src={cafe.cafeLogo}
-                  alt={cafe.cafeName}
-                  className="w-full h-full object-cover"
-                />
-              </button>
-            ))}
-          </div>}
+        <div className="absolute bottom-8 right-4">
+          {selectedCafeMedia.length !== 0 ? (
+            <button
+              className="bg-green-500 p-2 rounded-full text-white"
+              onClick={() => setIsSearchModalOpen(true)}
+            >
+              🔍
+            </button>
+          ) : null}
+        </div>
+        {isSearchModalOpen && (
+          <SearchModal
+            cafeName={cafeList}
+            isModalHandler={() => setIsSearchModalOpen(false)}
+            searchHandler={handleSearch}
+          />
+        )}
       </div>
     </div>
   );
