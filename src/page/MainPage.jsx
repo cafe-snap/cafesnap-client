@@ -9,7 +9,6 @@ const MainPage = () => {
   const [dataLoading, setDataLoading] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [isSearchReady, setIsSearchReady] = useState(false);
-  const [isTrigger, setIsTrigger] = useState(false);
   const [mediaIndex, setMediaIndex] = useState(0);
   const [crawlingDataCache, setCrawlingDataCache] = useState({});
   const [urlIndex, setUrlIndex] = useState({});
@@ -17,6 +16,7 @@ const MainPage = () => {
   const [searchingData, setSearchingData] = useState([]);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(1);
 
   useEffect(() => {
     const initialMediaRequest = async () => {
@@ -32,7 +32,6 @@ const MainPage = () => {
           setSelectedCafe(initialData);
           setCrawlingDataCache({ [initialData]: data.message.mediaResource[initialData] });
           setUrlIndex({ [initialData]: data.message.returnUrl });
-          setIsTrigger(true);
         }
       } catch (err) {
         alert(`초기미디어 크롤링 요청 실패 = ${err}`);
@@ -71,15 +70,16 @@ const MainPage = () => {
   };
 
   useEffect(() => {
+    if (cafeList && (currentIndex < cafeList.length)) {
+      const nextFetch = cafeList.slice(currentIndex, currentIndex + 3);
 
-    if ((cafeList !== null) && (isTrigger === true)) {
-      for (let i = 1; i < 4; i++) {
-        cafeMediaRequest(cafeList[i]);
-      }
+      Promise.all(nextFetch.map((cafeInfo) => cafeMediaRequest(cafeInfo)))
+        .then(() => {
+          setCurrentIndex((prev) => prev + 3);
+        })
+        .catch((err) => console.error(err));
     }
-
-  }, [cafeList, isTrigger]);
-
+  }, [cafeList, currentIndex]);
 
   const keywordMediaRequest = async (keyword, cafeInfo) => {
     try {
