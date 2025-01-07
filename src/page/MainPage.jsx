@@ -223,12 +223,15 @@ const MainPage = () => {
           </>
         )}
         {selectedCafeMedia.length === 0 ? null : (
-          <div className="flex flex-row items-center mt-4 gap-x-4 w-full px-4">
-            <div className="flex items-center">
+          <div className="relative w-full">
+            <div
+              className="absolute mt-6 ml-6 w-full overflow-x-auto no-scrollbar z-10"
+              style={{ whiteSpace: "nowrap" }}
+            >
               {cafeList.map((cafe, index) => (
                 <button
                   key={index}
-                  className={`w-10 h-10 rounded-full overflow-hidden border-2 ${
+                  className={`w-10 h-10 flex-shrink-0 rounded-full overflow-hidden border-2 ${
                     selectedCafe === cafe.cafeName ? "border-green-500" : "border-gray-700"
                   } ${selectedCafe && selectedCafe !== cafe.cafeName ? "hidden" : ""}`}
                   onClick={() => handleLogoClick(cafe.cafeName)}
@@ -241,24 +244,26 @@ const MainPage = () => {
                 </button>
               ))}
             </div>
-            {selectedCafeMedia[mediaIndex]?.postName && (
-              <a
-                href={selectedCafeMedia[mediaIndex]?.postLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-2 text-gray-300 text-sm"
-              >
-                <strong>{selectedCafeMedia[mediaIndex]?.postName}</strong>
-              </a>
-            )}
-            {selectedCafeMedia.length !== 0 ? (
-              <button
-                className="bg-green-500 p-2 rounded-full text-white"
-                onClick={() => setIsSearchModalOpen(true)}
-              >
-                🔍
-              </button>
-            ) : null}
+            <div className="relative flex flex-row items-center justify-center mt-4 ml-12 gap-x-4 w-full px-4">
+              {selectedCafeMedia[mediaIndex]?.postName && (
+                <a
+                  href={selectedCafeMedia[mediaIndex]?.postLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink w-3/5 mt-2 text-gray-300 text-sm"
+                >
+                  <strong>{selectedCafeMedia[mediaIndex]?.postName}</strong>
+                </a>
+              )}
+              {selectedCafeMedia.length !== 0 ? (
+                <button
+                  className="p-4 rounded-full text-white"
+                  onClick={() => setIsSearchModalOpen(true)}
+                >
+                  🔍
+                </button>
+              ) : null}
+            </div>
           </div>
         )}
         {isSearchModalOpen && (
