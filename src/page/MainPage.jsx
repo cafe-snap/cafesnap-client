@@ -24,7 +24,7 @@ const MainPage = () => {
   useEffect(() => {
     const initialMediaRequest = async () => {
       try {
-        const response = await fetch("http://localhost:3000/posts/initial", {
+        const response = await fetch("/api/posts/initial", {
           method: "post",
         });
         const data = await response.json();
@@ -47,7 +47,7 @@ const MainPage = () => {
   const cafeMediaRequest = async (cafeInfo) => {
     setDataLoading(true);
     try {
-      const response = await fetch("http://localhost:3000/posts/selection", {
+      const response = await fetch("/api/posts/selection", {
         method: "post",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(cafeInfo),
@@ -87,7 +87,7 @@ const MainPage = () => {
   const keywordMediaRequest = async (keyword, cafeInfo) => {
     try {
       setSearchIsLoading(true);
-      const response = await fetch("http://localhost:3000/posts/keyword", {
+      const response = await fetch("/api/posts/keyword", {
         method: "post",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ keyword, cafeInfo }),
@@ -105,7 +105,7 @@ const MainPage = () => {
 
   const extraCafeMediaRequest = async (nextUrl, cafeInfo) => {
     try {
-      const response = await fetch("http://localhost:3000/posts/addition", {
+      const response = await fetch("/api/posts/addition", {
         method: "post",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nextUrl, cafeInfo }),

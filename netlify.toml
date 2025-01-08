@@ -1,0 +1,4 @@
+ [[redirects]]
+    from = "/api/*"
+    to = "http://3.36.228.68:3000/:splat"
+    status = 200

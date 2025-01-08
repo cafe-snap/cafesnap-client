@@ -5,7 +5,7 @@ const StartingPage = () => {
 
   const loginRequest = async () => {
     try {
-      const response = await fetch("http://localhost:3000/login", {
+      const response = await fetch("/api/login", {
         method: "post",
       });
       const data = await response.json();
