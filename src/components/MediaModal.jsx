@@ -1,28 +1,50 @@
 import PropTypes from "prop-types";
+import { useState } from "react";
 
-const MediaModal = ({ source, type }) => {
+const MediaModal = ({ source, totalMediaCount, currentMediaIndex }) => {
+  const [isShowControl, setIsShowControl] = useState(false);
 
-  return(
-    <div className="fixed top-5 left-0 border-2 border-green-800 w-full h-[400px] justify-center items-center bg-black">
-      {type === "img" ? (
-        <img className="object-contain w-auto h-full max-w-full" src={source} />
-      ) : (
+  const toggleControl = () => {
+    setIsShowControl((prev) => !prev);
+  };
+
+  return (
+    <div
+      className="flex flex-col mt-10 w-full h-[400px] justify-center items-center bg-black overflow-hidden"
+      onClick={toggleControl}
+    >
+      <div className="relative w-full h-2 z-10">
+        {Array.from({ length: totalMediaCount }).map((_, index) => (
+          <div
+            key={index}
+            className={`absolute h-full transition-all ${
+              index <= currentMediaIndex ? "bg-green-500" : "bg-black"
+            }`}
+            style={{
+              width: `${100 / totalMediaCount}%`,
+              left: `${(100 / totalMediaCount) * index}%`,
+            }}
+          ></div>
+        ))}
+      </div>
+      <div className="relative w-full h-full flex justify-center items-center overflow-hidden">
         <video
-          className="object-contain w-auto h-full max-w-full"
+          className="object-contain max-h-[90%] w-auto h-auto"
           src={source}
           autoPlay
           playsInline
-          controls
+          controls={isShowControl}
           muted
         />
-      )}
+      </div>
     </div>
   );
 };
 
 MediaModal.propTypes = {
   source: PropTypes.string.isRequired,
-  type: PropTypes.string.isRequired
+  totalMediaCount: PropTypes.number.isRequired,
+  currentMediaIndex: PropTypes.number.isRequired,
 };
 
 export default MediaModal;
