@@ -17,6 +17,9 @@ const MainPage = () => {
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(1);
+  const [showFullTitle, setShowFullTitle] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState(null);
+  const [searchIsLoading, setSearchIsLoading] = useState(false);
 
   useEffect(() => {
     const initialMediaRequest = async () => {
@@ -83,6 +86,7 @@ const MainPage = () => {
 
   const keywordMediaRequest = async (keyword, cafeInfo) => {
     try {
+      setSearchIsLoading(true);
       const response = await fetch("http://localhost:3000/posts/keyword", {
         method: "post",
         headers: { "Content-Type": "application/json" },
@@ -159,6 +163,7 @@ const MainPage = () => {
 
   const handleSearch = async (keyword, cafeName) => {
     const cafeInfo = cafeList.find((cafe) => cafe.cafeName === cafeName);
+    setSearchKeyword(keyword);
     await keywordMediaRequest(keyword, cafeInfo);
   };
 
@@ -166,6 +171,7 @@ const MainPage = () => {
     setSelectedCafeMedia(Object.values(searchingData)[0]);
     setMediaIndex(0);
     setIsSearchReady(false);
+    setSearchIsLoading(false);
   };
 
   const handleTouchStart = (e) => {
@@ -216,9 +222,9 @@ const MainPage = () => {
             <span className="flex mt-2 text-white">확인 버튼을 눌러 시청해 주세요</span>
             <button
               onClick={handleSearchConfirm}
-              className="ml-2 text-white bg-green-500 px-2 py-1 rounded-md"
+              className="fixed top-4 ml-6 text-white bg-green-500 px-2 py-1 rounded-md"
             >
-              확인
+              {searchKeyword} 검색 결과가 도착했어요
             </button>
           </>
         )}

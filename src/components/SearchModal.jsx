@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import engToKoHelper from "../utils/keywordHelper";
 
 const SearchModal = ({ cafeName, isModalHandler, searchHandler }) => {
@@ -36,14 +36,29 @@ const SearchModal = ({ cafeName, isModalHandler, searchHandler }) => {
     setIsEnglish(false);
   };
 
-  const handleTransferCancle = () => {
-    setIsEnglish(false);
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
   };
 
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [searchKeyword, selectedCafe]);
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-      <div className="bg-black p-6 rounded-md w-96">
-        <h2 className="text-white text-xl mb-4">검색</h2>
+    <div
+      className="fixed h-[200px] inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      onClick={isModalHandler}
+    >
+      <div
+        className="p-6 rounded-md w-96"
+        onClick={(event) => event.stopPropagation()}
+      >
         <input
           type="text"
           placeholder="검색어 입력"
@@ -53,23 +68,12 @@ const SearchModal = ({ cafeName, isModalHandler, searchHandler }) => {
         />
         {isEnglish && (
           <div className="mb-4">
-            <p className="text-green-300 mb-2">
+            <button
+              className="text-green-300 mb-2"
+              onClick={handleTransferConfirm}
+            >
               이걸 찾으시나요? =  <strong>{transferKeyword}</strong>
-            </p>
-            <div className="flex gap-2">
-              <button
-                onClick={handleTransferConfirm}
-                className="bg-green-600 text-white px-4 py-2 rounded-md"
-              >
-                예
-              </button>
-              <button
-                onClick={handleTransferCancle}
-                className="bg-red-600 text-white px-4 py-2 rounded-md"
-              >
-                아니오
-              </button>
-            </div>
+            </button>
           </div>
         )}
         <div className="mb-4">
@@ -88,18 +92,6 @@ const SearchModal = ({ cafeName, isModalHandler, searchHandler }) => {
             ))}
           </select>
         </div>
-        <button
-          onClick={handleSearch}
-          className="bg-green-600 text-white px-4 py-2 rounded-md"
-        >
-          검색
-        </button>
-        <button
-          onClick={isModalHandler}
-          className="bg-red-600 text-white px-4 py-2 rounded-md ml-2"
-        >
-          취소
-        </button>
       </div>
     </div>
   );
