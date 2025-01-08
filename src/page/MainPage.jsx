@@ -139,6 +139,10 @@ const MainPage = () => {
     }
   }, [selectedCafe, crawlingDataCache]);
 
+  useEffect(() => {
+    setShowFullTitle(false);
+  }, [selectedCafeMedia, mediaIndex]);
+
   const handlePrevious = () => {
     setMediaIndex((prevIndex) => (prevIndex > 0) ? prevIndex - 1 : prevIndex);
   };
@@ -183,11 +187,11 @@ const MainPage = () => {
   };
 
   const handleTouchEnd = () => {
-    if ((touchStart - touchEnd) > 100) {
+    if ((touchStart - touchEnd) > 130) {
       handleNext();
     }
 
-    if ((touchStart - touchEnd) < -100) {
+    if ((touchStart - touchEnd) < -130) {
       handlePrevious();
     }
   };
@@ -200,26 +204,40 @@ const MainPage = () => {
     }
   };
 
+  useEffect(() => {
+    if (selectedCafeMedia.length > 0) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+  }, [selectedCafeMedia]);
+
   return (
-    <div
-      className="flex flex-col w-full min-h-screen bg-black items-center"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-    >
-      {(selectedCafeMedia.length === 0) ? (
-        <LoadingModal />
-      ) : (
-        <MediaModal
-          type={selectedCafeMedia[mediaIndex]?.type}
-          source={selectedCafeMedia[mediaIndex]?.src}
-        />
-      )}
-      <div className="flex flex-col items-center justify-center w-full mt-[420px]">
+    <div className="flex flex-col w-full h-screen bg-black overflow-hidden touch-pan-y">
+
+      <div
+        className="items-center mt-6"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        {(selectedCafeMedia.length === 0) ? (
+          <LoadingModal />
+        ) : (
+          <MediaModal
+            source={selectedCafeMedia[mediaIndex]?.src}
+            totalMediaCount={selectedCafeMedia.length}
+            currentMediaIndex={mediaIndex}
+          />
+        )}
+      </div>
+
+      <div className="flex flex-row mt-4 ml-8 gap-x-6 w-full">
+        {(searchIsLoading && !isSearchReady) && (
+          <div className="fixed top-4 w-4 h-4 rounded-full bg-green-600 animate-bigBounce" />
+        )}
         {isSearchReady && (
           <>
-            <span className="flex mt-2 text-white">🔍 검색 결과가 도착했습니다 🔍</span>
-            <span className="flex mt-2 text-white">확인 버튼을 눌러 시청해 주세요</span>
             <button
               onClick={handleSearchConfirm}
               className="fixed top-4 ml-6 text-white bg-green-500 px-2 py-1 rounded-md"
@@ -228,11 +246,12 @@ const MainPage = () => {
             </button>
           </>
         )}
+
         {selectedCafeMedia.length === 0 ? null : (
-          <div className="relative w-full">
+          <>
             <div
-              className="absolute mt-6 ml-6 w-full overflow-x-auto no-scrollbar z-10"
-              style={{ whiteSpace: "nowrap" }}
+              className="overflow-x-scroll no-scrollbar z-10"
+              style={{ whiteSpace: "nowrap", overflowX: "visible" }}
             >
               {cafeList.map((cafe, index) => {
                 const hasData = crawlingDataCache[cafe.cafeName] && crawlingDataCache[cafe.cafeName].length > 0;
@@ -258,27 +277,48 @@ const MainPage = () => {
                 );
               })}
             </div>
-            <div className="relative flex flex-row items-center justify-center mt-4 ml-12 gap-x-4 w-full px-4">
-              {selectedCafeMedia[mediaIndex]?.postName && (
-                <a
-                  href={selectedCafeMedia[mediaIndex]?.postLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="shrink w-3/5 mt-2 text-gray-300 text-sm"
-                >
-                  <strong>{selectedCafeMedia[mediaIndex]?.postName}</strong>
-                </a>
-              )}
-              {selectedCafeMedia.length !== 0 ? (
-                <button
-                  className="p-4 rounded-full text-white"
-                  onClick={() => setIsSearchModalOpen(true)}
-                >
-                  🔍
-                </button>
-              ) : null}
-            </div>
-          </div>
+
+            {selectedCafeMedia[mediaIndex]?.postName && (
+              <div className="shrink w-3/5 mt-2 text-gray-300 text-sm">
+                {!showFullTitle ? (
+                  <span
+                    onClick={() => setShowFullTitle(true)}
+                    className="block cursor-pointer overflow-hidden whitespace-nowrap text-ellipsis"
+                    style={{
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                    }}
+                    title={selectedCafeMedia[mediaIndex]?.postName}
+                  >
+                    {selectedCafeMedia[mediaIndex]?.postName}
+                  </span>
+                ) : (
+                  <span
+                    onClick={() => {
+                      setShowFullTitle(false);
+                      window.open(
+                        selectedCafeMedia[mediaIndex]?.postLink,
+                        "_blank"
+                      );
+                    }}
+                    className="block cursor-pointer text-green-500"
+                  >
+                    {selectedCafeMedia[mediaIndex]?.postName}
+                  </span>
+                )}
+              </div>
+            )}
+
+            {selectedCafeMedia.length !== 0 ? (
+              <button
+                className="fixed top-2 right-0 p-4 rounded-full text-white"
+                onClick={() => setIsSearchModalOpen(true)}
+              >
+                🔍
+              </button>
+            ) : null}
+          </>
         )}
         {isSearchModalOpen && (
           <SearchModal
