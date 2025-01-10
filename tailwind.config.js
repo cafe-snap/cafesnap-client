@@ -7,23 +7,23 @@ export default {
   theme: {
     extend: {
       animation: {
-        bigBounce: "bigBounce 500ms alternate infinite ease",
+        bigBounce: "bigBounce 700ms alternate infinite ease",
       },
       keyframes: {
         bigBounce: {
           "0%": {
-            top: "30px",
+            top: "28px",
             height: "5px",
             borderRadius: "60px 60px 20px 20px",
             transform: "scaleX(2)",
           },
           "35%": {
-            height: "16px",
+            height: "14px",
             borderRadius: "50%",
             transform: "scaleX(1)",
           },
           "100%": {
-            top: "0",
+            top: "4px",
           },
         },
       },

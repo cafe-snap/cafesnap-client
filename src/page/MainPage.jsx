@@ -235,13 +235,13 @@ const MainPage = () => {
 
       <div className="flex flex-row mt-4 ml-8 gap-x-6 w-full">
         {(searchIsLoading && !isSearchReady) && (
-          <div className="fixed top-4 w-4 h-4 rounded-full bg-green-600 animate-bigBounce" />
+          <div className="fixed top-4 w-4 h-4 rounded-full bg-gray-800 animate-bigBounce" />
         )}
         {isSearchReady && (
           <>
             <button
               onClick={handleSearchConfirm}
-              className="fixed top-4 ml-6 text-white bg-green-500 px-2 py-1 rounded-md"
+              className="fixed top-4 ml-12 text-white bg-black font-bold px-2 py-1"
             >
               {searchKeyword} 검색 결과가 도착했어요
             </button>
@@ -265,7 +265,7 @@ const MainPage = () => {
                     } ${selectedCafe && selectedCafe !== cafe.cafeName ? "hidden" : ""}`}
                     onClick={() => handleLogoClick(cafe.cafeName)}
                     style={{
-                      opacity: hasData ? 1 : 0.5,
+                      opacity: hasData ? 1 : 0.2,
                       pointerEvents: hasData ? "auto" : "none",
                     }}
                   >
@@ -280,7 +280,7 @@ const MainPage = () => {
             </div>
 
             {selectedCafeMedia[mediaIndex]?.postName && (
-              <div className="shrink w-3/5 mt-2 text-gray-300 text-sm">
+              <div className="shrink w-3/5 mt-2 text-gray-300 font-bold text-sm">
                 {!showFullTitle ? (
                   <span
                     onClick={() => setShowFullTitle(true)}
@@ -303,7 +303,7 @@ const MainPage = () => {
                         "_blank"
                       );
                     }}
-                    className="block cursor-pointer text-green-500"
+                    className="block cursor-pointer"
                   >
                     {selectedCafeMedia[mediaIndex]?.postName}
                   </span>

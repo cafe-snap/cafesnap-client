@@ -69,7 +69,7 @@ const SearchModal = ({ cafeName, isModalHandler, searchHandler }) => {
         {isEnglish && (
           <div className="mb-4">
             <button
-              className="text-green-300 mb-2"
+              className="text-white font-bold mb-2"
               onClick={handleTransferConfirm}
             >
               이걸 찾으시나요? =  <strong>{transferKeyword}</strong>
