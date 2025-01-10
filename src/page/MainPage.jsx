@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import LoadingModal from "../components/LoadingModal";
 import MediaModal from "../components/MediaModal";
 import SearchModal from "../components/SearchModal";
+import searchImg from "../asset/searchIcon.svg";
 
 const MainPage = () => {
   const [cafeList, setCafeList] = useState(null);
@@ -312,10 +313,10 @@ const MainPage = () => {
 
             {selectedCafeMedia.length !== 0 ? (
               <button
-                className="fixed top-2 right-0 p-4 rounded-full text-white"
+                className="fixed top-2 right-0 p-4"
                 onClick={() => setIsSearchModalOpen(true)}
               >
-                🔍
+                <img src={searchImg} alt="search Icon" />
               </button>
             ) : null}
           </>
