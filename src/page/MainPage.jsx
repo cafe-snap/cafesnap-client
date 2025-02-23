@@ -3,18 +3,12 @@ import LoadingModal from "../components/LoadingModal";
 import MediaModal from "../components/MediaModal";
 import SearchModal from "../components/SearchModal";
 import searchImg from "../asset/searchIcon.svg";
+import useApiStore from "../store/useApiStore";
 
 const MainPage = () => {
-  const [cafeList, setCafeList] = useState(null);
-  const [selectedCafe, setSelectedCafe] = useState(null);
-  const [dataLoading, setDataLoading] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-  const [isSearchReady, setIsSearchReady] = useState(false);
   const [mediaIndex, setMediaIndex] = useState(0);
-  const [crawlingDataCache, setCrawlingDataCache] = useState({});
-  const [urlIndex, setUrlIndex] = useState({});
   const [selectedCafeMedia, setSelectedCafeMedia] = useState([]);
-  const [searchingData, setSearchingData] = useState([]);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(1);
@@ -22,62 +16,31 @@ const MainPage = () => {
   const [searchKeyword, setSearchKeyword] = useState(null);
   const [searchIsLoading, setSearchIsLoading] = useState(false);
 
+  const {
+    fetchInitialApi,
+    fetchMediaApi,
+    fetchKeywordApi,
+    fetchAdditinoApi,
+    isSearchReady,
+    isDataLoading,
+    cafeList,
+    selectedCafe,
+    crawlingDataCache,
+    urlIndex,
+    searchingData,
+    setIsSearchReady,
+    setSelectedCafe
+  } = useApiStore();
+
   useEffect(() => {
-    const initialMediaRequest = async () => {
-      try {
-        const response = await fetch("/api/posts/initial", {
-          method: "post",
-        });
-        const data = await response.json();
-
-        if (data.success) {
-          const initialData = data.message.cafeUrlList[0]?.cafeName;
-          setCafeList(data.message.cafeUrlList);
-          setSelectedCafe(initialData);
-          setCrawlingDataCache({ [initialData]: data.message.mediaResource[initialData] });
-          setUrlIndex({ [initialData]: data.message.returnUrl });
-        }
-      } catch (err) {
-        alert(`초기미디어 크롤링 요청 실패 = ${err}`);
-      }
-    };
-
-    initialMediaRequest();
+    fetchInitialApi();
   }, []);
-
-  const cafeMediaRequest = async (cafeInfo) => {
-    setDataLoading(true);
-    try {
-      const response = await fetch("/api/posts/selection", {
-        method: "post",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(cafeInfo),
-      });
-      const data = await response.json();
-
-      if (data.success) {
-        const newReturnUrl = data.message.returnUrl || "";
-        setCrawlingDataCache((prev) => ({
-          ...prev,
-          [cafeInfo.cafeName]: data.message.mediaResource[cafeInfo.cafeName],
-        }));
-        setUrlIndex((prev) => ({
-          ...prev,
-          [cafeInfo.cafeName]: newReturnUrl,
-        }));
-      }
-    } catch (err) {
-      alert(`카페미디어 크롤링 요청 실패 = ${err}`);
-    } finally {
-      setDataLoading(false);
-    }
-  };
 
   useEffect(() => {
     if (cafeList && (currentIndex < cafeList.length)) {
       const nextFetch = cafeList.slice(currentIndex, currentIndex + 3);
 
-      Promise.all(nextFetch.map((cafeInfo) => cafeMediaRequest(cafeInfo)))
+      Promise.allSettled(nextFetch.map((cafeInfo) => fetchMediaApi(cafeInfo)))
         .then(() => {
           setCurrentIndex((prev) => prev + 3);
         })
@@ -85,56 +48,8 @@ const MainPage = () => {
     }
   }, [cafeList, currentIndex]);
 
-  const keywordMediaRequest = async (keyword, cafeInfo) => {
-    try {
-      setSearchIsLoading(true);
-      const response = await fetch("/api/posts/keyword", {
-        method: "post",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ keyword, cafeInfo }),
-      });
-      const data = await response.json();
-
-      if (data.success) {
-        setSearchingData(data.message);
-        setIsSearchReady(true);
-      }
-    } catch (err) {
-      alert(`카페미디어 크롤링 요청 실패 = ${err}`);
-    }
-  };
-
-  const extraCafeMediaRequest = async (nextUrl, cafeInfo) => {
-    try {
-      const response = await fetch("/api/posts/addition", {
-        method: "post",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nextUrl, cafeInfo }),
-      });
-      const data = await response.json();
-
-      if (data.success) {
-        const newMedia = data.message.mediaResource[cafeInfo.cafeName] || [];
-        const newReturnUrl = data.message.returnUrl || "";
-        setCrawlingDataCache((prev) => {
-          const existingMedia = prev[cafeInfo.cafeName] || [];
-          return {
-            ...prev,
-            [cafeInfo.cafeName]: [...existingMedia, ...newMedia],
-          };
-        });
-        setUrlIndex((prev) => ({
-          ...prev,
-          [cafeInfo.cafeName]: newReturnUrl,
-        }));
-      }
-    } catch (err) {
-      alert(`카페미디어 크롤링 요청 실패 = ${err}`);
-    }
-  };
-
   useEffect(() => {
-    if (selectedCafe && dataLoading === false) {
+    if (selectedCafe && isDataLoading === false) {
       const newMedia = (Object.values(crawlingDataCache[selectedCafe])) || [];
       setSelectedCafeMedia(newMedia);
     }
@@ -162,14 +77,14 @@ const MainPage = () => {
           return `${prefix}${newPageNum}`;
         });
       }
-      await extraCafeMediaRequest(nextUrl, cafeInfo);
+      await fetchAdditinoApi(nextUrl, cafeInfo);
     }
   };
 
   const handleSearch = async (keyword, cafeName) => {
     const cafeInfo = cafeList.find((cafe) => cafe.cafeName === cafeName);
     setSearchKeyword(keyword);
-    await keywordMediaRequest(keyword, cafeInfo);
+    await fetchKeywordApi(keyword, cafeInfo);
   };
 
   const handleSearchConfirm = () => {
