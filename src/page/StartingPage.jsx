@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import useApiStore from "../store/useApiStore";
 import { useEffect } from "react";
 
-
 const StartingPage = () => {
   const { fetchLoginApi, isNavigate } = useApiStore();
   const navigate = useNavigate();

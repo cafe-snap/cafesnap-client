@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import LoadingModal from "../components/LoadingModal";
 import MediaModal from "../components/MediaModal";
 import SearchModal from "../components/SearchModal";
+import ErrorModal from "../components/ErrorModal";
 import searchImg from "../asset/searchIcon.svg";
 import useApiStore from "../store/useApiStore";
 
@@ -23,6 +24,7 @@ const MainPage = () => {
     fetchAdditinoApi,
     isSearchReady,
     isDataLoading,
+    isErrorCount,
     cafeList,
     selectedCafe,
     crawlingDataCache,
@@ -130,7 +132,7 @@ const MainPage = () => {
 
   return (
     <div className="flex flex-col w-full h-screen bg-black overflow-hidden touch-pan-y">
-
+      {isErrorCount && <ErrorModal />}
       <div
         className="items-center mt-6"
         onTouchStart={handleTouchStart}
