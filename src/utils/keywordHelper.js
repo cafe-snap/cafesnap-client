@@ -1,30 +1,29 @@
 import { STARTWORDS, MIDWORDS, ENDWORDS, ENGTOKORMAP } from "./keywordConstants";
 
+const STARTWORDS_MAP = Object.fromEntries(STARTWORDS.map((char, idx) => [char, idx]));
+const MIDWORDS_MAP = Object.fromEntries(MIDWORDS.map((char, idx) => [char, idx]));
+const ENDWORDS_MAP = Object.fromEntries(ENDWORDS.map((char, idx) => [char, idx]));
+
 const engToKoHelper = (input) => {
   const engToKo = [...input].map((char) => ENGTOKORMAP[char] || "");
-  const resultArray = [];
+  let resultArray = [];
   let candidateArray = [];
 
   const makeWord = (buffer) => {
-    const start = STARTWORDS.indexOf(buffer[0]);
-    const mid = MIDWORDS.indexOf(buffer[1]);
-    const end = buffer[2] ? ENDWORDS.indexOf(buffer[2]) : 0;
+    const start = STARTWORDS_MAP[buffer[0]] ?? -1;
+    const mid = MIDWORDS_MAP[buffer[1]] ?? -1;
+    const end = buffer[2] ? ENDWORDS_MAP[buffer[2]] ?? 0 : 0;
 
-    return (
-      String.fromCharCode(0xac00 + ((start * 21) + mid) * 28 + end)
-    );
+    return start !== -1 && mid !== -1
+      ? String.fromCharCode(0xac00 + ((start * 21) + mid) * 28 + end)
+      : buffer.join("");
   };
 
   for (let i = 0; i < engToKo.length; i++) {
     const current = engToKo[i];
     const next = engToKo[i + 1] || null;
 
-    if ((STARTWORDS.includes(current) || ENDWORDS.includes(current)) && (STARTWORDS.includes(next) || ENDWORDS.includes(next))) {
-      candidateArray.push(current);
-      resultArray.push(makeWord(candidateArray));
-      candidateArray = [next];
-      i++;
-    } else if ((STARTWORDS.includes(current) || ENDWORDS.includes(current)) && MIDWORDS.includes(next)) {
+    if (STARTWORDS_MAP[current] !== undefined && MIDWORDS_MAP[next] !== undefined) {
       if (candidateArray.length > 0) {
         resultArray.push(makeWord(candidateArray));
       }
@@ -39,9 +38,7 @@ const engToKoHelper = (input) => {
     resultArray.push(makeWord(candidateArray));
   }
 
-  return (
-    resultArray.join("")
-  );
+  return resultArray.join("");
 };
 
 export default engToKoHelper;
