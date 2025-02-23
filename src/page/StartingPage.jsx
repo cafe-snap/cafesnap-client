@@ -1,27 +1,26 @@
 import { useNavigate } from "react-router-dom";
+import useApiStore from "../store/useApiStore";
+import { useEffect } from "react";
+
 
 const StartingPage = () => {
+  const { fetchLoginApi, isNavigate } = useApiStore();
   const navigate = useNavigate();
 
-  const loginRequest = async () => {
-    try {
-      const response = await fetch("/api/login", {
-        method: "post",
-      });
-      const data = await response.json();
-
-      if (data.success) {
-        navigate("/mainPage");
-      }
-    } catch (err) {
-      alert(`로그인 요청 실패 = ${err}`);
-    }
+  const handleOnClick = async () => {
+    await fetchLoginApi();
   };
+
+  useEffect(() => {
+    if (isNavigate) {
+      navigate("/mainPage");
+    }
+  }, [isNavigate]);
 
   return(
     <div
       className="flex flex-col w-full min-h-screen bg-black items-center justify-center gap-4"
-      onClick={loginRequest}
+      onClick={handleOnClick}
     >
       <span className="text-green-500 text-5xl">CAFESNAP</span>
       <span className="text-white text-2xl">로그인을 실행해 주세요</span>
