@@ -1,8 +1,15 @@
 import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
+import { CafeInfo } from "@/types/type";
 import engToKoHelper from "../utils/keywordHelper";
 
-const SearchModal = ({ cafeName, isModalHandler, searchHandler }) => {
+interface SearchModalProps {
+  cafeName: CafeInfo[];
+  isModalHandler: () => void;
+  searchHandler: (keyword: string, cafeName: string) => void;
+}
+
+const SearchModal = ({ cafeName, isModalHandler, searchHandler }: SearchModalProps) => {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [selectedCafe, setSelectedCafe] = useState("");
   const [transferKeyword, setTransferKeyword] = useState("");
@@ -17,7 +24,7 @@ const SearchModal = ({ cafeName, isModalHandler, searchHandler }) => {
     }
   };
 
-  const handleKeywordChange = (e) => {
+  const handleKeywordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchKeyword(value);
     const isEnglishOnly = /^[a-zA-Z\s]+$/.test(value);
@@ -36,7 +43,7 @@ const SearchModal = ({ cafeName, isModalHandler, searchHandler }) => {
     setIsEnglish(false);
   };
 
-  const handleKeyDown = (event) => {
+  const handleKeyDown = (event: KeyboardEvent) => {
     if (event.key === "Enter") {
       handleSearch();
     }
