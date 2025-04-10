@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { MediaItem } from "@/types/type";
 import LoadingModal from "../components/LoadingModal";
 import MediaModal from "../components/MediaModal";
 import SearchModal from "../components/SearchModal";
@@ -7,21 +8,17 @@ import searchImg from "../asset/searchIcon.svg";
 import useApiStore from "../store/useApiStore";
 
 const MainPage = () => {
-  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-  const [mediaIndex, setMediaIndex] = useState(0);
-  const [selectedCafeMedia, setSelectedCafeMedia] = useState([]);
-  const [touchStart, setTouchStart] = useState(0);
-  const [touchEnd, setTouchEnd] = useState(0);
-  const [currentIndex, setCurrentIndex] = useState(1);
-  const [showFullTitle, setShowFullTitle] = useState(false);
-  const [searchKeyword, setSearchKeyword] = useState(null);
-  const [searchIsLoading, setSearchIsLoading] = useState(false);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState<boolean>(false);
+  const [mediaIndex, setMediaIndex] = useState<number>(0);
+  const [selectedCafeMedia, setSelectedCafeMedia] = useState<MediaItem[]>([]);
+  const [touchStart, setTouchStart] = useState<number>(0);
+  const [touchEnd, setTouchEnd] = useState<number>(0);
+  const [currentIndex, setCurrentIndex] = useState<number>(1);
+  const [showFullTitle, setShowFullTitle] = useState<boolean>(false);
+  const [searchKeyword, setSearchKeyword] = useState<string | null>(null);
+  const [searchIsLoading, setSearchIsLoading] = useState<boolean>(false);
 
   const {
-    fetchInitialApi,
-    fetchMediaApi,
-    fetchKeywordApi,
-    fetchAdditinoApi,
     isSearchReady,
     isDataLoading,
     isErrorCount,
@@ -31,7 +28,11 @@ const MainPage = () => {
     urlIndex,
     searchingData,
     setIsSearchReady,
-    setSelectedCafe
+    setSelectedCafe,
+    fetchInitialApi,
+    fetchMediaApi,
+    fetchKeywordApi,
+    fetchAdditionApi
   } = useApiStore();
 
   useEffect(() => {
@@ -52,7 +53,11 @@ const MainPage = () => {
 
   useEffect(() => {
     if (selectedCafe && isDataLoading === false) {
-      const newMedia = (Object.values(crawlingDataCache[selectedCafe])) || [];
+      const newMedia = (crawlingDataCache[selectedCafe] || [])
+      .filter((url): url is string => typeof url === "string")
+      .map((url) => ({
+        src: url,
+      }));
       setSelectedCafeMedia(newMedia);
     }
   }, [selectedCafe, crawlingDataCache]);
@@ -67,40 +72,44 @@ const MainPage = () => {
 
   const handleNext = async () => {
     setMediaIndex((prevIndex) => (prevIndex < selectedCafeMedia.length - 1) ? prevIndex + 1 : prevIndex);
-    const cafeInfo = cafeList.find((cafe) => cafe.cafeName === selectedCafe);
+    const cafeInfo = cafeList?.find((cafe) => cafe.cafeName === selectedCafe);
 
-    if (mediaIndex === 1) {
+    if (selectedCafe && mediaIndex === 1) {
       const postUrl = urlIndex[selectedCafe];
       let nextUrl = "";
 
       if (postUrl) {
-        nextUrl = postUrl.replace(/(search\.page=)(\d+)/, (match, prefix, pageNum) => {
+        nextUrl = postUrl.replace(/(search\.page=)(\d+)/, (prefix: string, pageNum: string) => {
           const newPageNum = Number(pageNum) + 2;
           return `${prefix}${newPageNum}`;
         });
       }
-      await fetchAdditinoApi(nextUrl, cafeInfo);
+      if (cafeInfo) {
+        await fetchAdditionApi(nextUrl, cafeInfo);
+      }
     }
   };
 
-  const handleSearch = async (keyword, cafeName) => {
-    const cafeInfo = cafeList.find((cafe) => cafe.cafeName === cafeName);
+  const handleSearch = async (keyword: string, cafeName: string) => {
+    const cafeInfo = cafeList?.find((cafe) => cafe.cafeName === cafeName);
     setSearchKeyword(keyword);
-    await fetchKeywordApi(keyword, cafeInfo);
+    if (cafeInfo) {
+      await fetchKeywordApi(keyword, cafeInfo);
+    }
   };
 
   const handleSearchConfirm = () => {
     setSelectedCafeMedia(Object.values(searchingData)[0]);
     setMediaIndex(0);
-    setIsSearchReady(false);
+    setIsSearchReady();
     setSearchIsLoading(false);
   };
 
-  const handleTouchStart = (e) => {
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     setTouchStart(e.changedTouches[0].clientX);
   };
 
-  const handleTouchMove = (e) => {
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
     setTouchEnd(e.changedTouches[0].clientX);
   };
 
@@ -114,9 +123,9 @@ const MainPage = () => {
     }
   };
 
-  const handleLogoClick = (cafeName) => {
+  const handleLogoClick = (cafeName: string) => {
     if (selectedCafe === cafeName) {
-      setSelectedCafe(null);
+      setSelectedCafe("");
     } else {
       setSelectedCafe(cafeName);
     }
@@ -171,7 +180,7 @@ const MainPage = () => {
               className="overflow-x-scroll no-scrollbar z-10"
               style={{ whiteSpace: "nowrap", overflowX: "visible" }}
             >
-              {cafeList.map((cafe, index) => {
+              {cafeList?.map((cafe, index) => {
                 const hasData = crawlingDataCache[cafe.cafeName] && crawlingDataCache[cafe.cafeName].length > 0;
 
                 return (
@@ -240,7 +249,7 @@ const MainPage = () => {
         )}
         {isSearchModalOpen && (
           <SearchModal
-            cafeName={cafeList}
+            cafeName={cafeList ?? []}
             isModalHandler={() => setIsSearchModalOpen(false)}
             searchHandler={handleSearch}
           />
