@@ -12,7 +12,7 @@ const LoadingModal = () => {
     { src: searchImg, description: "원하는 키워드의 미디어를 확인해 보세요!" },
   ];
 
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
 
   const handleNextImage = () => {
     setCurrentImageIndex((prevIndex) =>
