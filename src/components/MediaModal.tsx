@@ -1,12 +1,18 @@
 import PropTypes from "prop-types";
 import { useState, useEffect, useRef } from "react";
 
-const MediaModal = ({ source, totalMediaCount, currentMediaIndex }) => {
-  const [isShowControl, setIsShowControl] = useState(false);
-  const [progressWidths, setProgressWidths] = useState(
+interface MediaModalProps {
+  source: string;
+  totalMediaCount: number;
+  currentMediaIndex: number;
+}
+
+const MediaModal = ({ source, totalMediaCount, currentMediaIndex }: MediaModalProps) => {
+  const [isShowControl, setIsShowControl] = useState<boolean>(false);
+  const [progressWidths, setProgressWidths] = useState<number[]>(
     Array(totalMediaCount).fill(0)
   );
-  const videoRef = useRef(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const toggleControl = () => {
     setIsShowControl((prev) => !prev);
