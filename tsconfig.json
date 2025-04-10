@@ -20,6 +20,7 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
+    "allowJs": true,
     "paths": {
       "@/*": ["src/*"],
       "@app/*": ["src/app/*"],
@@ -32,7 +33,7 @@
       "@widgets/*": ["src/widgets/*"]
     }
   },
-  "include": ["src", "vite.config.ts"],
+  "include": ["src", "vite.config.ts", "image.d.ts"],
   "exclude": ["node_modules"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
