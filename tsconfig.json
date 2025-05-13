@@ -31,7 +31,8 @@
       "@shared/utils/*": ["src/shared/utils/*"],
       "@types/*": ["src/types/*"],
       "@widgets/*": ["src/widgets/*"]
-    }
+    },
+    "types": ["vite/client"]
   },
   "include": ["src", "vite.config.ts", "image.d.ts"],
   "exclude": ["node_modules"],
