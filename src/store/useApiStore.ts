@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { MediaItem, CafeInfo } from "@/types/type";
 
+const API_BASE_URL = process.env.API_BASE_URL;
+
 type RetryFunction = (...args: any[]) => Promise<any>;
 
 type SearchingData = Record<string, MediaItem[]>;
@@ -92,7 +94,7 @@ const useApiStore = create<ApiStore>((set) => ({
 
   fetchLoginApi: async () => {
     try {
-      const data = await fetchWithRetry("http://172.30.1.19:3000/login", { method: "POST" });
+      const data = await fetchWithRetry(`${API_BASE_URL}/login`, { method: "POST" });
 
       if (data?.success) {
         set({ isNavigate: true });
@@ -104,7 +106,7 @@ const useApiStore = create<ApiStore>((set) => ({
 
   fetchInitialApi: async () => {
     try {
-      const data = await fetchWithRetry("http://172.30.1.19:3000/posts/initial", { method: "POST" });
+      const data = await fetchWithRetry(`${API_BASE_URL}/posts/initial`, { method: "POST" });
 
       if (data?.success) {
         const initialData = data.message.cafeUrlList[0]?.cafeName;
@@ -127,7 +129,7 @@ const useApiStore = create<ApiStore>((set) => ({
 
   fetchMediaApi: async (cafeInfo) => {
     try {
-      const data = await fetchWithRetry("http://172.30.1.19:3000/posts/selection", {
+      const data = await fetchWithRetry(`${API_BASE_URL}/posts/selection`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(cafeInfo),
@@ -153,7 +155,7 @@ const useApiStore = create<ApiStore>((set) => ({
 
   fetchKeywordApi: async (keyword, cafeInfo) => {
     try {
-      const data = await fetchWithRetry("http://172.30.1.19:3000/posts/keyword", {
+      const data = await fetchWithRetry(`${API_BASE_URL}/posts/keyword`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ keyword, cafeInfo }),
@@ -180,7 +182,7 @@ const useApiStore = create<ApiStore>((set) => ({
 
   fetchAdditionApi: async (nextUrl, cafeInfo) => {
     try {
-      const data = await fetchWithRetry("http://172.30.1.19:3000/posts/addition", {
+      const data = await fetchWithRetry(`${API_BASE_URL}/posts/addition`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nextUrl, cafeInfo }),
